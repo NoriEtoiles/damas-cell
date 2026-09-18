@@ -85,9 +85,13 @@
     // }
   }
 
-  document.querySelectorAll('[data-cta="whatsapp"]').forEach(function (btn) {
-    btn.addEventListener("click", function () {
-      trackWhatsAppClick(btn.getAttribute("data-cta-location") || "unknown");
-    });
+  // Pakai event delegation di document, bukan memasang listener satu per
+  // satu saat load. Alasannya: tombol "Chat WA" pada kartu produk baru
+  // dibuat belakangan oleh js/katalog.js, jadi listener yang dipasang di
+  // awal tidak akan menangkapnya.
+  document.addEventListener("click", function (event) {
+    var btn = event.target.closest('[data-cta="whatsapp"]');
+    if (!btn) return;
+    trackWhatsAppClick(btn.getAttribute("data-cta-location") || "unknown");
   });
 })();

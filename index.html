@@ -152,11 +152,20 @@
       </div>
     </section>
 
-    <!--
-      TODO — Fase 3 (PRD Bagian 11): Sneak Peek Katalog
-      Section grid produk (4-6 kartu) yang diambil dari Google Sheet (JSON).
-      Ditambahkan setelah fetch data & rendering kartu produk otomatis siap.
-    -->
+    <!-- ============ SNEAK PEEK KATALOG ============
+         Isinya diambil otomatis dari Google Sheet oleh js/katalog.js.
+         Kalau Sheet belum tersambung atau gagal dimuat, seluruh section ini
+         disembunyikan sendiri supaya halaman Home tetap rapi. -->
+    <section class="katalog-section katalog-section--alt" aria-label="Sekilas Katalog">
+      <div class="container">
+        <div class="katalog-section__kepala">
+          <h2>Sekilas Katalog</h2>
+          <a href="katalog.html" class="katalog-section__tautan">Lihat semua produk →</a>
+        </div>
+
+        <div class="katalog-grid" id="katalogGrid" data-mode="sneak-peek"></div>
+      </div>
+    </section>
 
     <!--
       TODO — Fase 4 (PRD Bagian 11): Form Cek Kerusakan
@@ -213,6 +222,8 @@
     </div>
   </footer>
 
+  <script src="js/config.js"></script>
   <script src="js/main.js"></script>
+  <script src="js/katalog.js"></script>
 </body>
 </html>

@@ -11,6 +11,7 @@
    5. Hero
    6. Layanan Unggulan
    7. Placeholder halaman (Katalog/Servis/Lokasi — sementara)
+   7b. Katalog produk (kartu, filter kategori, skeleton loading)
    8. Footer
    9. Responsive breakpoints per komponen (mobile-first)
    10. Reduced motion & focus states
@@ -497,6 +498,206 @@ p {
 }
 
 /* -------------------------------------------------------------------------
+   7b. KATALOG PRODUK
+   Kartu produk dirender otomatis oleh js/katalog.js dari data Google Sheet.
+   ------------------------------------------------------------------------- */
+.katalog-section {
+  padding-block: var(--space-6);
+}
+
+.katalog-section--alt {
+  background-color: var(--color-bg-alt);
+}
+
+.katalog-section__kepala {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+}
+
+.katalog-section__tautan {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--color-primary);
+}
+
+.katalog-section__tautan:hover {
+  text-decoration: underline;
+}
+
+/* Filter kategori */
+.katalog-filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  margin-bottom: var(--space-4);
+}
+
+.filter-chip {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: 14px;
+  padding: 8px 16px;
+  border-radius: 999px;
+  border: 1px solid var(--color-border);
+  background-color: var(--color-bg);
+  color: var(--color-text-muted);
+  transition: background-color var(--transition-fast), color var(--transition-fast),
+    border-color var(--transition-fast);
+}
+
+.filter-chip:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.filter-chip.is-active {
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+  color: #ffffff;
+}
+
+/* Grid kartu */
+.katalog-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-2);
+}
+
+.produk {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  transition: border-color var(--transition-fast), transform var(--transition-fast);
+}
+
+.produk:hover {
+  border-color: var(--color-primary);
+  transform: translateY(-2px);
+}
+
+.produk--habis {
+  opacity: 0.72;
+}
+
+.produk__media {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  background-color: var(--color-bg-alt);
+}
+
+.produk__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.produk__badge {
+  position: absolute;
+  top: var(--space-1);
+  left: var(--space-1);
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: 11px;
+  letter-spacing: 0.02em;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background-color: rgba(33, 37, 41, 0.75);
+  color: #ffffff;
+}
+
+.produk__badge.is-tersedia {
+  background-color: var(--color-accent-dark);
+}
+
+.produk__badge.is-habis {
+  background-color: #8A929A;
+}
+
+.produk__badge.is-preorder {
+  background-color: var(--color-primary);
+}
+
+.produk__isi {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  gap: var(--space-1);
+  padding: var(--space-2);
+}
+
+.produk__nama {
+  font-size: 15px;
+  line-height: 1.35;
+}
+
+.produk__harga {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--color-primary);
+}
+
+.produk__catatan {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--color-text-muted);
+}
+
+.btn--sm {
+  padding: 10px 18px;
+  font-size: 14px;
+  width: 100%;
+}
+
+/* Tombol didorong ke dasar kartu supaya sejajar antar kartu
+   walau panjang nama produk berbeda-beda. Jarak minimalnya sudah
+   dijamin oleh `gap` pada .produk__isi. */
+.produk__cta {
+  margin-top: auto;
+}
+
+/* Skeleton saat data masih dimuat */
+.produk--skeleton {
+  pointer-events: none;
+}
+
+.produk--skeleton .produk__media,
+.skeleton-baris {
+  background: linear-gradient(
+    90deg,
+    var(--color-bg-alt) 25%,
+    #EFF2F5 37%,
+    var(--color-bg-alt) 63%
+  );
+  background-size: 400% 100%;
+  animation: skeleton-geser 1.4s ease infinite;
+}
+
+.skeleton-baris {
+  display: block;
+  height: 12px;
+  border-radius: 4px;
+  margin-bottom: var(--space-1);
+}
+
+.skeleton-baris--pendek {
+  width: 55%;
+}
+
+@keyframes skeleton-geser {
+  0% { background-position: 100% 50%; }
+  100% { background-position: 0 50%; }
+}
+
+/* -------------------------------------------------------------------------
    8. FOOTER
    ------------------------------------------------------------------------- */
 .site-footer {
@@ -619,6 +820,11 @@ p {
     gap: var(--space-3);
   }
 
+  .katalog-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-3);
+  }
+
   .service {
     flex-direction: column;
     align-items: flex-start;
@@ -647,6 +853,20 @@ p {
   }
 
   .services {
+    padding-block: var(--space-7);
+  }
+
+  .katalog-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  /* Sneak peek di Home tetap 3 kolom supaya 6 produk jatuh rapi
+     jadi 2 baris penuh, bukan 4 + 2 yang menggantung. */
+  .katalog-grid[data-mode="sneak-peek"] {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .katalog-section {
     padding-block: var(--space-7);
   }
 

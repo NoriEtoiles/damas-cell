@@ -51,19 +51,14 @@
       </div>
     </section>
 
-    <section class="container">
-      <div class="placeholder-panel">
-        <img class="placeholder-panel__icon" src="assets/placeholder-foto-produk.png" alt="" width="56" height="56">
-        <h2>Katalog online sedang disiapkan</h2>
-        <p>Data produk akan tampil otomatis dari Google Sheet begitu Fase 3 (Integrasi Data Katalog) rampung — lihat PRD Bagian 11. Sementara itu, tanya stok &amp; harga terbaru langsung ke admin.</p>
-        <a
-          href="https://wa.me/6285640179995?text=Halo%20Admin%20Damas%20Cell%2C%20saya%20mau%20tanya%20stok%20HP%20yang%20tersedia"
-          class="btn btn--accent"
-          target="_blank"
-          rel="noopener"
-          data-cta="whatsapp"
-          data-cta-location="katalog-placeholder"
-        >Tanya Stok via WA</a>
+    <section class="katalog-section">
+      <div class="container">
+        <!-- Tombol filter kategori diisi otomatis oleh js/katalog.js
+             berdasarkan kategori yang benar-benar ada di Google Sheet. -->
+        <div class="katalog-filter" id="katalogFilter" hidden></div>
+
+        <!-- Kartu produk dirender otomatis ke dalam elemen ini. -->
+        <div class="katalog-grid" id="katalogGrid"></div>
       </div>
     </section>
   </main>
@@ -117,6 +112,8 @@
     </div>
   </footer>
 
+  <script src="js/config.js"></script>
   <script src="js/main.js"></script>
+  <script src="js/katalog.js"></script>
 </body>
 </html>
