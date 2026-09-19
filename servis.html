@@ -52,18 +52,41 @@
     </section>
 
     <section class="container">
-      <div class="placeholder-panel">
-        <img class="placeholder-panel__icon" src="assets/icon-servis-cepat.png" alt="" width="56" height="56">
-        <h2>Formulir Cek Kerusakan sedang disiapkan</h2>
-        <p>Formulir online (Google Forms) akan disematkan di sini pada Fase 4 — lihat PRD Bagian 11. Sementara itu, ceritakan langsung keluhan HP-mu ke admin lewat WhatsApp.</p>
-        <a
-          href="https://wa.me/6285640179995?text=Halo%20Admin%20Damas%20Cell%2C%20HP%20saya%20bermasalah%20dan%20ingin%20konsultasi%20servis"
-          class="btn btn--accent"
-          target="_blank"
-          rel="noopener"
-          data-cta="whatsapp"
-          data-cta-location="servis-placeholder"
-        >Konsultasi via WA</a>
+      <div class="langkah-section">
+        <h2>Cara Servis di Damas Cell</h2>
+        <ol class="langkah-grid">
+          <li class="langkah">
+            <span class="langkah__nomor">1</span>
+            <h3 class="langkah__judul">Ceritakan keluhannya</h3>
+            <p class="langkah__desc">Isi formulir di bawah atau chat WhatsApp. Sebutkan tipe HP dan gejalanya.</p>
+          </li>
+          <li class="langkah">
+            <span class="langkah__nomor">2</span>
+            <h3 class="langkah__judul">Kami cek &amp; kabari</h3>
+            <p class="langkah__desc">Teknisi memeriksa kerusakan, lalu mengabari perkiraan biaya dan lamanya.</p>
+          </li>
+          <li class="langkah">
+            <span class="langkah__nomor">3</span>
+            <h3 class="langkah__judul">Dikerjakan setelah setuju</h3>
+            <p class="langkah__desc">Servis baru dikerjakan kalau kamu sudah setuju dengan biayanya.</p>
+          </li>
+          <li class="langkah">
+            <span class="langkah__nomor">4</span>
+            <h3 class="langkah__judul">HP siap diambil</h3>
+            <p class="langkah__desc">Kami kabari begitu selesai. Banyak perbaikan ringan bisa ditunggu di tempat.</p>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <section class="container">
+      <div class="form-section">
+        <h2>Formulir Cek Kerusakan</h2>
+        <p class="form-section__desc">Isi data di bawah ini, nanti admin menghubungi kamu kembali lewat WhatsApp.</p>
+
+        <!-- Formulir disisipkan otomatis oleh js/servis.js sesuai
+             SERVIS_FORM_URL di js/config.js. -->
+        <div id="servisForm"></div>
       </div>
     </section>
   </main>
@@ -117,6 +140,8 @@
     </div>
   </footer>
 
+  <script src="js/config.js"></script>
   <script src="js/main.js"></script>
+  <script src="js/servis.js"></script>
 </body>
 </html>
