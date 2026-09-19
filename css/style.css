@@ -343,6 +343,11 @@ p {
    ------------------------------------------------------------------------- */
 .hero {
   position: relative;
+  /* width 100% wajib ada. Tanpa ini, kombinasi aspect-ratio + min-height
+     membuat browser menghitung LEBAR dari tinggi (480px), sehingga hero
+     jadi lebih lebar dari layar ponsel dan halaman bisa digeser
+     menyamping. */
+  width: 100%;
   min-height: 480px;
   aspect-ratio: 1 / 1;
   display: flex;
@@ -698,6 +703,128 @@ p {
 }
 
 /* -------------------------------------------------------------------------
+   7c. SERVIS (alur langkah, embed formulir, ajakan di Home)
+   ------------------------------------------------------------------------- */
+.langkah-section {
+  margin-block: var(--space-6) var(--space-5);
+}
+
+.langkah-grid {
+  list-style: none;
+  counter-reset: langkah;
+  margin-top: var(--space-4);
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-3);
+}
+
+.langkah {
+  position: relative;
+  padding: var(--space-3);
+  background-color: var(--color-bg-alt);
+  border-radius: var(--radius-md);
+}
+
+.langkah__nomor {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: var(--color-primary);
+  color: #ffffff;
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 15px;
+  margin-bottom: var(--space-1);
+}
+
+.langkah__judul {
+  font-size: 16px;
+  margin-bottom: 4px;
+}
+
+.langkah__desc {
+  font-size: 14px;
+  color: var(--color-text-muted);
+}
+
+/* Embed formulir */
+.form-section {
+  margin-block: var(--space-5) var(--space-6);
+}
+
+.form-section__desc {
+  margin-top: var(--space-1);
+  margin-bottom: var(--space-3);
+  color: var(--color-text-muted);
+}
+
+.form-embed {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background-color: var(--color-bg-alt);
+}
+
+.form-embed iframe {
+  display: block;
+  width: 100%;
+  border: 0;
+}
+
+.form-embed__bantuan {
+  margin-top: var(--space-2);
+  font-size: 14px;
+  color: var(--color-text-muted);
+}
+
+.form-embed__bantuan a {
+  color: var(--color-primary);
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+/* Banner ajakan servis di Home */
+.cta-servis {
+  background-color: var(--color-primary);
+  color: #ffffff;
+  padding-block: var(--space-5);
+}
+
+.cta-servis__isi {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.cta-servis__judul {
+  color: #ffffff;
+}
+
+.cta-servis__desc {
+  margin-top: var(--space-1);
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 15px;
+}
+
+.cta-servis__tombol {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+}
+
+.btn--putih {
+  background-color: #ffffff;
+  color: var(--color-primary);
+}
+
+.btn--putih:hover {
+  background-color: var(--color-primary-tint);
+}
+
+/* -------------------------------------------------------------------------
    8. FOOTER
    ------------------------------------------------------------------------- */
 .site-footer {
@@ -825,6 +952,20 @@ p {
     gap: var(--space-3);
   }
 
+  .langkah-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .cta-servis__isi {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .cta-servis__tombol {
+    flex-shrink: 0;
+  }
+
   .service {
     flex-direction: column;
     align-items: flex-start;
@@ -868,6 +1009,10 @@ p {
 
   .katalog-section {
     padding-block: var(--space-7);
+  }
+
+  .langkah-grid {
+    grid-template-columns: repeat(4, 1fr);
   }
 
   .site-footer {
