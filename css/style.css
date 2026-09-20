@@ -943,8 +943,8 @@ p {
   }
 
   .services__grid {
-    grid-template-columns: repeat(3, 1fr);
-    gap: var(--space-3);
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-4) var(--space-3);
   }
 
   .katalog-grid {
@@ -974,7 +974,9 @@ p {
     padding: 0 var(--space-3);
   }
 
-  .service:first-child {
+  /* Di tablet grid-nya 2 kolom, jadi item ke-1 dan ke-3 berada di kolom
+     kiri — garis pemisah kirinya perlu dihapus, bukan hanya item pertama. */
+  .service:nth-child(odd) {
     border-left: none;
     padding-left: 0;
   }
@@ -995,6 +997,22 @@ p {
 
   .services {
     padding-block: var(--space-7);
+  }
+
+  /* Desktop cukup lebar untuk 4 layanan sejajar dalam satu baris. */
+  .services__grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--space-3);
+  }
+
+  .service:nth-child(odd) {
+    border-left: 1px solid var(--color-border);
+    padding-left: var(--space-3);
+  }
+
+  .service:first-child {
+    border-left: none;
+    padding-left: 0;
   }
 
   .katalog-grid {
