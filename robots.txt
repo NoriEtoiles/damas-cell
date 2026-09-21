@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://damas-cell.vercel.app/sitemap.xml
+Sitemap: https://damascell.vercel.app/sitemap.xml
