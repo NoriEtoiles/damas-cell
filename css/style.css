@@ -523,15 +523,40 @@ p {
   margin-bottom: var(--space-3);
 }
 
+/* -------------------------------------------------------------------------
+   UTILITY: garis bawah dinamis untuk tautan teks biasa (bukan tombol)
+   Dipakai di footer (nomor WA, "Lihat peta & rute") dan tautan konten
+   seperti "Lihat semua produk". Warna garis ikut warna teks (currentColor)
+   supaya otomatis pas dipakai di latar terang (footer) atau gelap (nav).
+   ------------------------------------------------------------------------- */
+.link-underline {
+  position: relative;
+  display: inline-block;
+}
+
+.link-underline::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -2px;
+  height: 1px;
+  background-color: currentColor;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 300ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.link-underline:hover::after,
+.link-underline:focus-visible::after {
+  transform: scaleX(1);
+}
+
 .katalog-section__tautan {
   font-family: var(--font-heading);
   font-weight: 600;
   font-size: 15px;
   color: var(--color-primary);
-}
-
-.katalog-section__tautan:hover {
-  text-decoration: underline;
 }
 
 /* Filter kategori */
@@ -868,26 +893,52 @@ p {
   color: rgba(255, 255, 255, 0.92);
 }
 
-.footer__list a:hover {
-  text-decoration: underline;
+.footer__link-more {
+  display: inline-block;
+  margin-top: 2px;
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.92);
 }
 
 .footer__wa-btn {
   margin-top: var(--space-2);
 }
 
-.footer__map {
-  border-radius: var(--radius-md);
-  overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  background-color: rgba(0, 0, 0, 0.15);
+/* Ikon sosial media di footer — SVG inline (bukan logo resmi platform)
+   supaya tidak menduplikasi aset bermerek pihak ketiga, tapi tetap mudah
+   dikenali bentuknya. Warna ikut currentColor, jadi otomatis pas di latar
+   footer yang gelap. */
+.social-icons {
+  display: flex;
+  gap: 10px;
+  margin-top: var(--space-2);
 }
 
-.footer__map iframe {
-  width: 100%;
-  height: 220px;
-  border: 0;
-  display: block;
+.social-icons a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.75);
+  transition: background-color var(--transition-fast), color var(--transition-fast),
+    transform var(--transition-fast);
+}
+
+.social-icons a:hover,
+.social-icons a:focus-visible {
+  background-color: rgba(255, 255, 255, 0.18);
+  color: #ffffff;
+  transform: translateY(-2px);
+}
+
+.social-icons svg {
+  width: 20px;
+  height: 20px;
 }
 
 .footer__bottom {
@@ -897,6 +948,47 @@ p {
   font-size: 13px;
   color: rgba(255, 255, 255, 0.55);
   text-align: center;
+}
+
+/* -------------------------------------------------------------------------
+   LOKASI — panel alamat + peta (khusus halaman lokasi.html)
+   Dipisah dari .footer__grid supaya tidak ikut memakai grid 3 kolom milik
+   footer (itu penyebab tampilan aneh di desktop sebelumnya: 2 elemen
+   dipaksa masuk grid 3 kolom, kolom ke-3 kosong menganga).
+   ------------------------------------------------------------------------- */
+.lokasi-panel {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-4);
+  margin-block: var(--space-6);
+}
+
+.lokasi-map {
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  background-color: var(--color-bg-alt);
+}
+
+/* aspect-ratio (bukan height tetap) supaya peta menyesuaikan lebar
+   kolomnya secara proporsional di perangkat apa pun. */
+.lokasi-map iframe {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  border: 0;
+}
+
+@media (min-width: 768px) {
+  .lokasi-panel {
+    grid-template-columns: 5fr 7fr;
+    align-items: start;
+    gap: var(--space-5);
+  }
+
+  .lokasi-map iframe {
+    aspect-ratio: 1 / 1;
+  }
 }
 
 /* -------------------------------------------------------------------------
@@ -927,7 +1019,11 @@ p {
     position: relative;
   }
 
-  .primary-nav a.is-active::after {
+  /* Garis bawah dinamis: tersembunyi (scaleX 0) lalu "tumbuh" dari kiri
+     saat hover/focus. Halaman aktif selalu menampilkannya (scaleX 1)
+     tanpa perlu hover. transform dipakai (bukan width) supaya animasinya
+     mulus di-GPU-accelerate, bukan memicu reflow tiap frame. */
+  .primary-nav a::after {
     content: "";
     position: absolute;
     left: 0;
@@ -935,6 +1031,15 @@ p {
     bottom: -4px;
     height: 2px;
     background-color: var(--color-primary);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 320ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .primary-nav a:hover::after,
+  .primary-nav a:focus-visible::after,
+  .primary-nav a.is-active::after {
+    transform: scaleX(1);
   }
 
   .hero {
