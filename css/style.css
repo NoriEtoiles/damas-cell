@@ -541,6 +541,7 @@ p {
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   overflow: hidden;
+  cursor: pointer;
   transition: border-color var(--transition-fast), transform var(--transition-fast);
 }
 
@@ -549,20 +550,30 @@ p {
   transform: translateY(-2px);
 }
 
+.produk:focus-visible {
+  outline: 3px solid var(--color-primary);
+  outline-offset: -2px;
+}
+
 .produk--habis {
   opacity: 0.72;
 }
 
 .produk__media {
   position: relative;
-  aspect-ratio: 1 / 1;
+  aspect-ratio: 4 / 5;
   background-color: var(--color-bg-alt);
 }
 
-.produk__media img {
+.produk__foto {
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+.produk__foto--placeholder {
+  object-fit: contain;
+  padding: 16%;
 }
 
 .produk__badge {
@@ -659,116 +670,142 @@ p {
   100% { background-position: 0 50%; }
 }
 
-.produk__galeri-badge {
+.produk__panah {
   position: absolute;
-  top: var(--space-1);
-  right: var(--space-1);
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  font-family: var(--font-heading);
-  font-weight: 600;
-  font-size: 11px;
-  padding: 4px 9px;
-  border-radius: 999px;
-  background-color: rgba(33, 37, 41, 0.75);
-  color: #ffffff;
-}
-
-.produk__galeri-badge svg {
-  width: 13px;
-  height: 13px;
-}
-
-button.produk__media--galeri {
-  display: block;
-  width: 100%;
-  padding: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 28px;
+  height: 28px;
   border: 0;
-  cursor: zoom-in;
-  font: inherit;
-  color: inherit;
-  background-color: var(--color-bg-alt);
+  border-radius: 50%;
+  background-color: rgba(0, 0, 0, 0.45);
+  color: #ffffff;
+  font-size: 18px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
 }
 
-.produk__media--galeri:focus-visible {
-  outline: 3px solid var(--color-primary);
-  outline-offset: -3px;
+.produk__panah--kiri {
+  left: 6px;
 }
 
-.modal-galeri {
+.produk__panah--kanan {
+  right: 6px;
+}
+
+.produk__panah:focus-visible {
+  outline: 2px solid #ffffff;
+  outline-offset: 1px;
+}
+
+.produk__dots {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 4px;
+}
+
+.produk__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.6);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25);
+}
+
+.produk__dot.is-aktif {
+  background-color: #ffffff;
+}
+
+.modal-detail {
   position: fixed;
   inset: 0;
   z-index: 1000;
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: var(--space-2);
 }
 
-.modal-galeri[hidden] {
+.modal-detail[hidden] {
   display: none;
 }
 
-body.has-modal-galeri {
+body.has-modal-detail {
   overflow: hidden;
 }
 
-.modal-galeri__overlay {
+.modal-detail__overlay {
   position: absolute;
   inset: 0;
-  background-color: rgba(18, 21, 24, 0.9);
+  background-color: rgba(18, 21, 24, 0.85);
 }
 
-.modal-galeri__dialog {
+.modal-detail__tutup {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 2;
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: 50%;
+  background-color: rgba(0, 0, 0, 0.55);
+  color: #ffffff;
+  font-size: 20px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.modal-detail__dialog {
   position: relative;
   z-index: 1;
   display: flex;
   flex-direction: column;
-  align-items: center;
   gap: var(--space-2);
-  width: min(92vw, 720px);
-  max-height: 90vh;
-  padding: var(--space-2);
+  width: min(94vw, 480px);
+  max-height: 92vh;
+  overflow-y: auto;
+  background-color: var(--color-bg);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
 }
 
-.modal-galeri__gambar {
-  max-width: 100%;
-  max-height: 62vh;
-  width: auto;
+.modal-detail__foto-wrap {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  max-height: 46vh;
   border-radius: var(--radius-sm);
+  overflow: hidden;
   background-color: var(--color-bg-alt);
-  object-fit: contain;
 }
 
-.modal-galeri__tutup {
+.modal-detail__gambar {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background-color: var(--color-bg-alt);
+}
+
+.modal-detail__panah {
   position: absolute;
-  top: -6px;
-  right: -6px;
+  top: 50%;
+  transform: translateY(-50%);
   width: 40px;
   height: 40px;
   border: 0;
   border-radius: 50%;
-  background-color: #ffffff;
-  color: var(--color-text);
-  font-size: 22px;
-  line-height: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-}
-
-.modal-galeri__panah {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 44px;
-  height: 44px;
-  border: 0;
-  border-radius: 50%;
   background-color: rgba(255, 255, 255, 0.92);
   color: var(--color-text);
-  font-size: 26px;
+  font-size: 24px;
   line-height: 1;
   display: flex;
   align-items: center;
@@ -776,26 +813,26 @@ body.has-modal-galeri {
   cursor: pointer;
 }
 
-.modal-galeri__panah--kiri {
-  left: 4px;
+.modal-detail__panah--kiri {
+  left: 8px;
 }
 
-.modal-galeri__panah--kanan {
-  right: 4px;
+.modal-detail__panah--kanan {
+  right: 8px;
 }
 
-.modal-galeri__thumbs {
+.modal-detail__thumbs {
   display: flex;
   gap: var(--space-1);
   max-width: 100%;
   overflow-x: auto;
-  padding-bottom: 4px;
+  padding-bottom: 2px;
 }
 
-.modal-galeri__thumb {
+.modal-detail__thumb {
   flex: 0 0 auto;
-  width: 56px;
-  height: 56px;
+  width: 52px;
+  height: 52px;
   padding: 0;
   border: 2px solid transparent;
   border-radius: var(--radius-sm);
@@ -805,25 +842,54 @@ body.has-modal-galeri {
   background: none;
 }
 
-.modal-galeri__thumb img {
+.modal-detail__thumb img {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
-.modal-galeri__thumb.is-aktif {
+.modal-detail__thumb.is-aktif {
   border-color: var(--color-accent);
   opacity: 1;
 }
 
-@media (min-width: 768px) {
-  .modal-galeri__panah {
-    width: 52px;
-    height: 52px;
-  }
+.modal-detail__info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
 
-  .modal-galeri__gambar {
-    max-height: 70vh;
+.modal-detail__badge {
+  position: static;
+  align-self: flex-start;
+}
+
+.modal-detail__nama {
+  font-size: 18px;
+  line-height: 1.3;
+}
+
+.modal-detail__harga {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 18px;
+  color: var(--color-primary);
+}
+
+.modal-detail__catatan {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--color-text-muted);
+  white-space: pre-line;
+}
+
+.modal-detail__info .btn {
+  margin-top: var(--space-1);
+}
+
+@media (min-width: 768px) {
+  .modal-detail__dialog {
+    padding: var(--space-4);
   }
 }
 

@@ -131,21 +131,52 @@
     }
     return "https://wa.me/" + WA_NUMBER + "?text=" + encodeURIComponent(pesan);
   }
-  function renderKartu(produk) {
+  var produkTertampil = [];
+  function renderGrid(wadahGrid, daftar) {
+    produkTertampil = daftar;
+    wadahGrid.innerHTML = daftar.map(function(p, i) {
+      return renderKartu(p, i);
+    }).join("");
+  }
+  function renderKartu(produk, index) {
     var daftarFoto = daftarFotoProduk(produk.foto);
-    var fotoUtama = daftarFoto[0] || PLACEHOLDER_IMG;
     var jumlahFoto = daftarFoto.length;
-    var bisaGaleri = jumlahFoto > 1;
+    var isPlaceholder = jumlahFoto === 0;
+    var fotoUtama = daftarFoto[0] || PLACEHOLDER_IMG;
     var statusKelas = kelasStatus(produk.status);
     var habis = statusKelas === "is-habis";
     var badgeStatus = produk.status ? '<span class="produk__badge ' + statusKelas + '">' + escapeHtml(produk.status) + "</span>" : "";
-    var badgeGaleri = bisaGaleri ? '<span class="produk__galeri-badge" aria-hidden="true">' + '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2" stroke="currentColor" stroke-width="1.7"/><circle cx="9" cy="11" r="2" stroke="currentColor" stroke-width="1.7"/><path d="M4 17l5-4 3 2.5 3-3 5 4.5" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>' + jumlahFoto + "</span>" : "";
     var catatan = produk.catatan ? '<p class="produk__catatan">' + escapeHtml(produk.catatan) + "</p>" : "";
     var harga = formatHarga(produk.harga);
     var hargaHtml = harga ? '<p class="produk__harga">' + escapeHtml(harga) + "</p>" : "";
-    var imgTag = '<img src="' + escapeHtml(fotoUtama) + '" alt="' + escapeHtml(produk.nama) + '" ' + 'loading="lazy" width="300" height="300" ' + "onerror=\"this.onerror=null;this.src='" + PLACEHOLDER_IMG + "';\">";
-    var media = bisaGaleri ? '<button type="button" class="produk__media produk__media--galeri" ' + 'data-fotos="' + escapeHtml(JSON.stringify(daftarFoto)) + '" ' + 'aria-label="Lihat ' + jumlahFoto + " foto " + escapeHtml(produk.nama) + '">' + imgTag + badgeStatus + badgeGaleri + "</button>" : '<div class="produk__media">' + imgTag + badgeStatus + "</div>";
-    return '<article class="produk' + (habis ? " produk--habis" : "") + '">' + media + '<div class="produk__isi">' + '<h3 class="produk__nama">' + escapeHtml(produk.nama) + "</h3>" + hargaHtml + catatan + '<a class="btn btn--accent btn--sm produk__cta" href="' + tautanWA(produk) + '" ' + 'target="_blank" rel="noopener" data-cta="whatsapp" data-cta-location="kartu-produk">' + "Chat WA</a>" + "</div>" + "</article>";
+    var kelasFoto = "produk__foto" + (isPlaceholder ? " produk__foto--placeholder" : "");
+    var imgTag = '<img class="' + kelasFoto + '" src="' + escapeHtml(fotoUtama) + '" alt="' + escapeHtml(produk.nama) + '" ' + 'loading="lazy" ' + "onerror=\"this.onerror=null;this.src='" + PLACEHOLDER_IMG + "';this.classList.add('produk__foto--placeholder');\">";
+    var kontrolCarousel = "";
+    if (jumlahFoto > 1) {
+      kontrolCarousel = '<button type="button" class="produk__panah produk__panah--kiri" data-carousel-prev aria-label="Foto sebelumnya">&lsaquo;</button>' + '<button type="button" class="produk__panah produk__panah--kanan" data-carousel-next aria-label="Foto berikutnya">&rsaquo;</button>' + '<div class="produk__dots" aria-hidden="true">' + daftarFoto.map(function(_, i) {
+        return '<span class="produk__dot' + (i === 0 ? " is-aktif" : "") + '"></span>';
+      }).join("") + "</div>";
+    }
+    var media = '<div class="produk__media" data-fotos="' + escapeHtml(JSON.stringify(daftarFoto)) + '" data-pos="0">' + imgTag + badgeStatus + kontrolCarousel + "</div>";
+    return '<article class="produk' + (habis ? " produk--habis" : "") + '" ' + 'data-produk-index="' + index + '" tabindex="0" role="button" ' + 'aria-label="Lihat detail ' + escapeHtml(produk.nama) + '">' + media + '<div class="produk__isi">' + '<h3 class="produk__nama">' + escapeHtml(produk.nama) + "</h3>" + hargaHtml + catatan + '<a class="btn btn--accent btn--sm produk__cta" href="' + tautanWA(produk) + '" ' + 'target="_blank" rel="noopener" data-cta="whatsapp" data-cta-location="kartu-produk">' + "Chat WA</a>" + "</div>" + "</article>";
+  }
+  function gantiFotoKartu(mediaEl, arah) {
+    var fotos;
+    try {
+      fotos = JSON.parse(mediaEl.getAttribute("data-fotos") || "[]");
+    } catch (err) {
+      return;
+    }
+    if (!fotos.length) return;
+    var pos = Number(mediaEl.getAttribute("data-pos") || 0);
+    pos = (pos + arah + fotos.length) % fotos.length;
+    mediaEl.setAttribute("data-pos", pos);
+    var img = mediaEl.querySelector(".produk__foto");
+    if (img) img.src = fotos[pos];
+    var dots = mediaEl.querySelectorAll(".produk__dot");
+    dots.forEach(function(dot, i) {
+      dot.classList.toggle("is-aktif", i === pos);
+    });
   }
   function renderSkeleton(jumlah) {
     var html = "";
@@ -158,92 +189,130 @@
     var tautan = "https://wa.me/" + WA_NUMBER + "?text=" + encodeURIComponent("Halo Admin Damas Cell, saya mau tanya stok yang tersedia");
     return '<div class="placeholder-panel">' + '<img class="placeholder-panel__icon" src="' + PLACEHOLDER_IMG + '" alt="" width="56" height="56">' + "<h2>" + escapeHtml(judul) + "</h2>" + "<p>" + escapeHtml(pesan) + "</p>" + '<a class="btn btn--accent" href="' + tautan + '" target="_blank" rel="noopener" ' + 'data-cta="whatsapp" data-cta-location="katalog-fallback">' + escapeHtml(ctaTeks) + "</a>" + "</div>";
   }
-  var modalState = {
+  var detailState = {
     fotos: [],
     indexAktif: 0,
     elemenPemicu: null
   };
-  function buatModalGaleriJikaBelumAda() {
-    var modalAda = document.getElementById("modalGaleri");
+  function buatModalDetailJikaBelumAda() {
+    var modalAda = document.getElementById("modalDetail");
     if (modalAda) return modalAda;
     var wadah = document.createElement("div");
-    wadah.id = "modalGaleri";
-    wadah.className = "modal-galeri";
+    wadah.id = "modalDetail";
+    wadah.className = "modal-detail";
     wadah.hidden = true;
     wadah.setAttribute("aria-hidden", "true");
-    wadah.innerHTML = '<div class="modal-galeri__overlay" data-galeri-tutup></div>' + '<div class="modal-galeri__dialog" role="dialog" aria-modal="true" aria-label="Galeri foto produk">' + '<button type="button" class="modal-galeri__tutup" data-galeri-tutup aria-label="Tutup galeri">&times;</button>' + '<button type="button" class="modal-galeri__panah modal-galeri__panah--kiri" data-galeri-prev aria-label="Foto sebelumnya">&lsaquo;</button>' + '<img class="modal-galeri__gambar" id="modalGaleriGambar" src="" alt="">' + '<button type="button" class="modal-galeri__panah modal-galeri__panah--kanan" data-galeri-next aria-label="Foto berikutnya">&rsaquo;</button>' + '<div class="modal-galeri__thumbs" id="modalGaleriThumbs"></div>' + "</div>";
+    wadah.innerHTML = '<div class="modal-detail__overlay" data-detail-tutup></div>' + '<button type="button" class="modal-detail__tutup" data-detail-tutup aria-label="Tutup detail produk">&times;</button>' + '<div class="modal-detail__dialog" role="dialog" aria-modal="true" aria-label="Detail produk">' + '<div class="modal-detail__foto-wrap">' + '<img class="modal-detail__gambar" id="modalDetailGambar" src="" alt="">' + '<button type="button" class="modal-detail__panah modal-detail__panah--kiri" data-detail-prev aria-label="Foto sebelumnya">&lsaquo;</button>' + '<button type="button" class="modal-detail__panah modal-detail__panah--kanan" data-detail-next aria-label="Foto berikutnya">&rsaquo;</button>' + "</div>" + '<div class="modal-detail__thumbs" id="modalDetailThumbs"></div>' + '<div class="modal-detail__info">' + '<span class="produk__badge modal-detail__badge" id="modalDetailBadge"></span>' + '<h2 class="modal-detail__nama" id="modalDetailNama"></h2>' + '<p class="modal-detail__harga" id="modalDetailHarga"></p>' + '<p class="modal-detail__catatan" id="modalDetailCatatan"></p>' + '<a class="btn btn--accent" id="modalDetailCta" href="#" target="_blank" rel="noopener" ' + 'data-cta="whatsapp" data-cta-location="modal-detail">Chat WA</a>' + "</div>" + "</div>";
     document.body.appendChild(wadah);
     wadah.addEventListener("click", function(e) {
-      if (e.target.closest("[data-galeri-tutup]")) tutupGaleri();
-      if (e.target.closest("[data-galeri-prev]")) gantiFotoGaleri(-1);
-      if (e.target.closest("[data-galeri-next]")) gantiFotoGaleri(1);
-      var thumb = e.target.closest("[data-galeri-thumb]");
-      if (thumb) {
-        tampilkanFotoGaleri(Number(thumb.getAttribute("data-galeri-thumb")));
-      }
+      if (e.target.closest("[data-detail-tutup]")) tutupDetail();
+      if (e.target.closest("[data-detail-prev]")) gantiFotoDetail(-1);
+      if (e.target.closest("[data-detail-next]")) gantiFotoDetail(1);
+      var thumb = e.target.closest("[data-detail-thumb]");
+      if (thumb) tampilkanFotoDetail(Number(thumb.getAttribute("data-detail-thumb")));
     });
     document.addEventListener("keydown", function(e) {
       if (wadah.hidden) return;
-      if (e.key === "Escape") tutupGaleri();
-      if (e.key === "ArrowLeft") gantiFotoGaleri(-1);
-      if (e.key === "ArrowRight") gantiFotoGaleri(1);
+      if (e.key === "Escape") tutupDetail();
+      if (e.key === "ArrowLeft") gantiFotoDetail(-1);
+      if (e.key === "ArrowRight") gantiFotoDetail(1);
     });
     return wadah;
   }
-  function tampilkanFotoGaleri(index) {
-    var total = modalState.fotos.length;
+  function tampilkanFotoDetail(index) {
+    var total = detailState.fotos.length;
     if (!total) return;
-    modalState.indexAktif = (index + total) % total;
-    var gambar = document.getElementById("modalGaleriGambar");
+    detailState.indexAktif = (index + total) % total;
+    var gambar = document.getElementById("modalDetailGambar");
     if (gambar) {
-      gambar.src = modalState.fotos[modalState.indexAktif];
-      gambar.alt = "Foto produk " + (modalState.indexAktif + 1) + " dari " + total;
+      gambar.src = detailState.fotos[detailState.indexAktif];
+      gambar.alt = "Foto produk " + (detailState.indexAktif + 1) + " dari " + total;
     }
-    var wadahThumbs = document.getElementById("modalGaleriThumbs");
+    var panahKiri = document.querySelector("#modalDetail [data-detail-prev]");
+    var panahKanan = document.querySelector("#modalDetail [data-detail-next]");
+    var adaBanyakFoto = total > 1;
+    if (panahKiri) panahKiri.hidden = !adaBanyakFoto;
+    if (panahKanan) panahKanan.hidden = !adaBanyakFoto;
+    var wadahThumbs = document.getElementById("modalDetailThumbs");
     if (wadahThumbs) {
-      wadahThumbs.innerHTML = modalState.fotos.map(function(url, i) {
-        return '<button type="button" class="modal-galeri__thumb' + (i === modalState.indexAktif ? " is-aktif" : "") + '" data-galeri-thumb="' + i + '" aria-label="Lihat foto ' + (i + 1) + '">' + '<img src="' + escapeHtml(url) + '" alt="" loading="lazy">' + "</button>";
+      wadahThumbs.hidden = !adaBanyakFoto;
+      wadahThumbs.innerHTML = !adaBanyakFoto ? "" : detailState.fotos.map(function(url, i) {
+        return '<button type="button" class="modal-detail__thumb' + (i === detailState.indexAktif ? " is-aktif" : "") + '" data-detail-thumb="' + i + '" aria-label="Lihat foto ' + (i + 1) + '">' + '<img src="' + escapeHtml(url) + '" alt="" loading="lazy">' + "</button>";
       }).join("");
     }
   }
-  function gantiFotoGaleri(arah) {
-    tampilkanFotoGaleri(modalState.indexAktif + arah);
+  function gantiFotoDetail(arah) {
+    tampilkanFotoDetail(detailState.indexAktif + arah);
   }
-  function bukaGaleri(fotos, indexAwal, elemenPemicu) {
-    if (!fotos || !fotos.length) return;
-    var modal = buatModalGaleriJikaBelumAda();
-    modalState.fotos = fotos;
-    modalState.elemenPemicu = elemenPemicu || null;
+  function bukaDetail(produk, elemenPemicu) {
+    var modal = buatModalDetailJikaBelumAda();
+    var daftarFoto = daftarFotoProduk(produk.foto);
+    detailState.fotos = daftarFoto.length ? daftarFoto : [ PLACEHOLDER_IMG ];
+    detailState.elemenPemicu = elemenPemicu || null;
+    var statusKelas = kelasStatus(produk.status);
+    var badge = document.getElementById("modalDetailBadge");
+    if (badge) {
+      badge.textContent = produk.status || "";
+      badge.className = "produk__badge modal-detail__badge" + (statusKelas ? " " + statusKelas : "");
+      badge.hidden = !produk.status;
+    }
+    var namaEl = document.getElementById("modalDetailNama");
+    if (namaEl) namaEl.textContent = produk.nama;
+    var hargaTeks = formatHarga(produk.harga);
+    var hargaEl = document.getElementById("modalDetailHarga");
+    if (hargaEl) {
+      hargaEl.textContent = hargaTeks;
+      hargaEl.hidden = !hargaTeks;
+    }
+    var catatanEl = document.getElementById("modalDetailCatatan");
+    if (catatanEl) {
+      catatanEl.textContent = produk.catatan || "";
+      catatanEl.hidden = !produk.catatan;
+    }
+    var ctaEl = document.getElementById("modalDetailCta");
+    if (ctaEl) ctaEl.href = tautanWA(produk);
     modal.hidden = false;
     modal.setAttribute("aria-hidden", "false");
-    document.body.classList.add("has-modal-galeri");
-    tampilkanFotoGaleri(indexAwal || 0);
-    var tombolTutup = modal.querySelector(".modal-galeri__tutup");
+    document.body.classList.add("has-modal-detail");
+    tampilkanFotoDetail(0);
+    var tombolTutup = modal.querySelector(".modal-detail__tutup");
     if (tombolTutup) tombolTutup.focus();
   }
-  function tutupGaleri() {
-    var modal = document.getElementById("modalGaleri");
+  function tutupDetail() {
+    var modal = document.getElementById("modalDetail");
     if (!modal || modal.hidden) return;
     modal.hidden = true;
     modal.setAttribute("aria-hidden", "true");
-    document.body.classList.remove("has-modal-galeri");
-    if (modalState.elemenPemicu && typeof modalState.elemenPemicu.focus === "function") {
-      modalState.elemenPemicu.focus();
+    document.body.classList.remove("has-modal-detail");
+    if (detailState.elemenPemicu && typeof detailState.elemenPemicu.focus === "function") {
+      detailState.elemenPemicu.focus();
     }
-    modalState.elemenPemicu = null;
+    detailState.elemenPemicu = null;
   }
   document.addEventListener("click", function(e) {
-    var pemicu = e.target.closest(".produk__media--galeri");
-    if (!pemicu) return;
-    var fotosMentah = pemicu.getAttribute("data-fotos");
-    if (!fotosMentah) return;
-    var fotos;
-    try {
-      fotos = JSON.parse(fotosMentah);
-    } catch (err) {
+    var tombolPrev = e.target.closest("[data-carousel-prev]");
+    var tombolNext = e.target.closest("[data-carousel-next]");
+    if (tombolPrev || tombolNext) {
+      var media = e.target.closest(".produk__media");
+      if (media) gantiFotoKartu(media, tombolPrev ? -1 : 1);
       return;
     }
-    bukaGaleri(fotos, 0, pemicu);
+    if (e.target.closest(".produk__cta")) return;
+    var kartu = e.target.closest(".produk[data-produk-index]");
+    if (!kartu) return;
+    var idx = Number(kartu.getAttribute("data-produk-index"));
+    var produk = produkTertampil[idx];
+    if (produk) bukaDetail(produk, kartu);
+  });
+  document.addEventListener("keydown", function(e) {
+    if (e.key !== "Enter" && e.key !== " ") return;
+    if (e.target.closest("[data-carousel-prev],[data-carousel-next],.produk__cta")) return;
+    var kartu = e.target.closest(".produk[data-produk-index]");
+    if (!kartu) return;
+    e.preventDefault();
+    var idx = Number(kartu.getAttribute("data-produk-index"));
+    var produk = produkTertampil[idx];
+    if (produk) bukaDetail(produk, kartu);
   });
   function pasangFilter(wadahFilter, wadahGrid, semuaProduk) {
     if (!wadahFilter) return;
@@ -273,7 +342,7 @@
       var terpilih = pilihan ? semuaProduk.filter(function(p) {
         return p.kategori === pilihan;
       }) : semuaProduk;
-      wadahGrid.innerHTML = terpilih.map(renderKartu).join("");
+      renderGrid(wadahGrid, terpilih);
     });
   }
   function tambahPemecahCache(url) {
@@ -327,15 +396,15 @@
         return;
       }
       var tampil = batas ? produk.slice(0, batas) : produk;
-      wadahGrid.innerHTML = tampil.map(renderKartu).join("");
+      renderGrid(wadahGrid, tampil);
       if (!modeSneakPeek) {
         pasangFilter(wadahFilter, wadahGrid, produk);
       }
     }).catch(function(err) {
       console.error("[Damas Cell] Gagal memuat katalog:", err);
       if (modeSneakPeek) {
-        var sectionInduk = wadahGrid.closest("section");
-        if (sectionInduk) sectionInduk.hidden = true;
+        var sectionIndukErr = wadahGrid.closest("section");
+        if (sectionIndukErr) sectionIndukErr.hidden = true;
         return;
       }
       wadahGrid.classList.remove("katalog-grid");
