@@ -1,30 +1,3 @@
-/* =========================================================================
-   DAMAS CELL — STYLE.CSS
-   Website Katalog & Servis — Damas Cell (Karanganom, Klaten)
-   Arsitektur: HTML/CSS/JS statis (lihat PRD v2.0, Bagian 7)
-
-   Daftar isi:
-   1. Reset & base
-   2. Design tokens (warna, tipografi, spacing)
-   3. Utilities (container, tombol, aksesibilitas)
-   4. Header & navigasi
-   5. Hero
-   6. Layanan Unggulan
-   7. Placeholder halaman (Katalog/Servis/Lokasi — sementara)
-   7b. Katalog produk (kartu, filter kategori, skeleton loading)
-   8. Footer
-   9. Responsive breakpoints per komponen (mobile-first)
-   10. Reduced motion & focus states
-
-   Catatan maintenance:
-   - Semua warna/font diambil dari token di bagian 2. Jangan hardcode hex
-     baru di luar bagian ini kecuali warna sekali-pakai yang sangat spesifik.
-   - Breakpoint utama: 768px (tablet ke atas), 1024px (desktop ke atas).
-   ========================================================================= */
-
-/* -------------------------------------------------------------------------
-   1. RESET & BASE
-   ------------------------------------------------------------------------- */
 *,
 *::before,
 *::after {
@@ -62,16 +35,16 @@ button {
   cursor: pointer;
 }
 
-/* -------------------------------------------------------------------------
-   2. DESIGN TOKENS
-   ------------------------------------------------------------------------- */
 :root {
-  /* Warna brand — sesuai Style Guide (PRD Bagian 6.1) */
-  --color-primary: #1B5E9E;        /* Biru Teknologi — warna utama brand */
-  --color-primary-dark: #123F6B;   /* Varian gelap: footer, hover, band diagonal hero */
-  --color-primary-tint: #EAF2FA;   /* Varian sangat muda: latar ikon, alternator section */
-  --color-accent: #25D366;         /* Hijau WhatsApp — khusus CTA */
-  --color-accent-dark: #1DA851;    /* Hover/aktif tombol WA */
+  
+  color-scheme: light;
+
+  
+  --color-primary: #1B5E9E;        
+  --color-primary-dark: #123F6B;   
+  --color-primary-tint: #EAF2FA;   
+  --color-accent: #25D366;         
+  --color-accent-dark: #1DA851;    
 
   --color-bg: #FFFFFF;
   --color-bg-alt: #F8F9FA;
@@ -79,11 +52,11 @@ button {
   --color-text-muted: #5A6570;
   --color-border: #E4E8EC;
 
-  /* Tipografi — sesuai Style Guide (PRD Bagian 6.1) */
+  
   --font-heading: 'Montserrat', 'Segoe UI', sans-serif;
   --font-body: 'Open Sans', 'Segoe UI', sans-serif;
 
-  /* Spacing scale (basis 8px) */
+  
   --space-1: 8px;
   --space-2: 16px;
   --space-3: 24px;
@@ -92,14 +65,14 @@ button {
   --space-6: 64px;
   --space-7: 96px;
 
-  /* Layout */
+  
   --container-width: 1180px;
   --container-pad: 20px;
   --header-height: 72px;
   --radius-sm: 8px;
   --radius-md: 14px;
 
-  /* Motion */
+  
   --transition-fast: 150ms ease;
   --transition-base: 250ms ease;
 }
@@ -110,9 +83,6 @@ button {
   }
 }
 
-/* -------------------------------------------------------------------------
-   BASE TYPOGRAPHY
-   ------------------------------------------------------------------------- */
 body {
   font-family: var(--font-body);
   font-size: 16px;
@@ -147,9 +117,6 @@ p {
   max-width: 62ch;
 }
 
-/* -------------------------------------------------------------------------
-   3. UTILITIES
-   ------------------------------------------------------------------------- */
 .container {
   width: 100%;
   max-width: var(--container-width);
@@ -195,7 +162,6 @@ p {
   margin-bottom: var(--space-4);
 }
 
-/* Tombol dasar */
 .btn {
   display: inline-flex;
   align-items: center;
@@ -242,9 +208,6 @@ p {
   flex-shrink: 0;
 }
 
-/* -------------------------------------------------------------------------
-   4. HEADER & NAVIGASI
-   ------------------------------------------------------------------------- */
 .site-header {
   position: sticky;
   top: 0;
@@ -338,15 +301,9 @@ p {
   color: var(--color-primary);
 }
 
-/* -------------------------------------------------------------------------
-   5. HERO
-   ------------------------------------------------------------------------- */
 .hero {
   position: relative;
-  /* width 100% wajib ada. Tanpa ini, kombinasi aspect-ratio + min-height
-     membuat browser menghitung LEBAR dari tinggi (480px), sehingga hero
-     jadi lebih lebar dari layar ponsel dan halaman bisa digeser
-     menyamping. */
+  
   width: 100%;
   min-height: 480px;
   aspect-ratio: 1 / 1;
@@ -354,10 +311,7 @@ p {
   align-items: flex-end;
   overflow: hidden;
   background-color: var(--color-primary);
-  /* Motif "spanduk" — dua bidang biru datar dipisah garis diagonal,
-     menggemakan gaya spanduk fisik toko selagi belum ada foto hero final.
-     Ganti dengan foto toko: tambahkan background-image di sini lalu
-     pertahankan .hero__overlay agar teks tetap terbaca. */
+  
   background-image: linear-gradient(
     115deg,
     var(--color-primary-dark) 0%,
@@ -402,9 +356,6 @@ p {
   margin-top: var(--space-4);
 }
 
-/* -------------------------------------------------------------------------
-   6. LAYANAN UNGGULAN
-   ------------------------------------------------------------------------- */
 .services {
   padding-block: var(--space-6);
   background-color: var(--color-bg);
@@ -455,9 +406,6 @@ p {
   font-size: 15px;
 }
 
-/* -------------------------------------------------------------------------
-   7. PLACEHOLDER HALAMAN (Katalog / Servis / Lokasi — konten sementara)
-   ------------------------------------------------------------------------- */
 .page-header {
   background-color: var(--color-primary-tint);
   padding-block: var(--space-5);
@@ -502,10 +450,6 @@ p {
   margin-top: var(--space-3);
 }
 
-/* -------------------------------------------------------------------------
-   7b. KATALOG PRODUK
-   Kartu produk dirender otomatis oleh js/katalog.js dari data Google Sheet.
-   ------------------------------------------------------------------------- */
 .katalog-section {
   padding-block: var(--space-6);
 }
@@ -523,12 +467,6 @@ p {
   margin-bottom: var(--space-3);
 }
 
-/* -------------------------------------------------------------------------
-   UTILITY: garis bawah dinamis untuk tautan teks biasa (bukan tombol)
-   Dipakai di footer (nomor WA, "Lihat peta & rute") dan tautan konten
-   seperti "Lihat semua produk". Warna garis ikut warna teks (currentColor)
-   supaya otomatis pas dipakai di latar terang (footer) atau gelap (nav).
-   ------------------------------------------------------------------------- */
 .link-underline {
   position: relative;
   display: inline-block;
@@ -559,7 +497,6 @@ p {
   color: var(--color-primary);
 }
 
-/* Filter kategori */
 .katalog-filter {
   display: flex;
   flex-wrap: wrap;
@@ -591,7 +528,6 @@ p {
   color: #ffffff;
 }
 
-/* Grid kartu */
 .katalog-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -687,14 +623,10 @@ p {
   width: 100%;
 }
 
-/* Tombol didorong ke dasar kartu supaya sejajar antar kartu
-   walau panjang nama produk berbeda-beda. Jarak minimalnya sudah
-   dijamin oleh `gap` pada .produk__isi. */
 .produk__cta {
   margin-top: auto;
 }
 
-/* Skeleton saat data masih dimuat */
 .produk--skeleton {
   pointer-events: none;
 }
@@ -727,9 +659,174 @@ p {
   100% { background-position: 0 50%; }
 }
 
-/* -------------------------------------------------------------------------
-   7c. SERVIS (alur langkah, embed formulir, ajakan di Home)
-   ------------------------------------------------------------------------- */
+.produk__galeri-badge {
+  position: absolute;
+  top: var(--space-1);
+  right: var(--space-1);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: 11px;
+  padding: 4px 9px;
+  border-radius: 999px;
+  background-color: rgba(33, 37, 41, 0.75);
+  color: #ffffff;
+}
+
+.produk__galeri-badge svg {
+  width: 13px;
+  height: 13px;
+}
+
+button.produk__media--galeri {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  cursor: zoom-in;
+  font: inherit;
+  color: inherit;
+  background-color: var(--color-bg-alt);
+}
+
+.produk__media--galeri:focus-visible {
+  outline: 3px solid var(--color-primary);
+  outline-offset: -3px;
+}
+
+.modal-galeri {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-galeri[hidden] {
+  display: none;
+}
+
+body.has-modal-galeri {
+  overflow: hidden;
+}
+
+.modal-galeri__overlay {
+  position: absolute;
+  inset: 0;
+  background-color: rgba(18, 21, 24, 0.9);
+}
+
+.modal-galeri__dialog {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  width: min(92vw, 720px);
+  max-height: 90vh;
+  padding: var(--space-2);
+}
+
+.modal-galeri__gambar {
+  max-width: 100%;
+  max-height: 62vh;
+  width: auto;
+  border-radius: var(--radius-sm);
+  background-color: var(--color-bg-alt);
+  object-fit: contain;
+}
+
+.modal-galeri__tutup {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  width: 40px;
+  height: 40px;
+  border: 0;
+  border-radius: 50%;
+  background-color: #ffffff;
+  color: var(--color-text);
+  font-size: 22px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.modal-galeri__panah {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.92);
+  color: var(--color-text);
+  font-size: 26px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.modal-galeri__panah--kiri {
+  left: 4px;
+}
+
+.modal-galeri__panah--kanan {
+  right: 4px;
+}
+
+.modal-galeri__thumbs {
+  display: flex;
+  gap: var(--space-1);
+  max-width: 100%;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+.modal-galeri__thumb {
+  flex: 0 0 auto;
+  width: 56px;
+  height: 56px;
+  padding: 0;
+  border: 2px solid transparent;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  opacity: 0.6;
+  cursor: pointer;
+  background: none;
+}
+
+.modal-galeri__thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.modal-galeri__thumb.is-aktif {
+  border-color: var(--color-accent);
+  opacity: 1;
+}
+
+@media (min-width: 768px) {
+  .modal-galeri__panah {
+    width: 52px;
+    height: 52px;
+  }
+
+  .modal-galeri__gambar {
+    max-height: 70vh;
+  }
+}
+
 .langkah-section {
   margin-block: var(--space-6) var(--space-5);
 }
@@ -775,7 +872,6 @@ p {
   color: var(--color-text-muted);
 }
 
-/* Embed formulir */
 .form-section {
   margin-block: var(--space-5) var(--space-6);
 }
@@ -811,7 +907,6 @@ p {
   text-decoration: underline;
 }
 
-/* Banner ajakan servis di Home */
 .cta-servis {
   background-color: var(--color-primary);
   color: #ffffff;
@@ -849,9 +944,6 @@ p {
   background-color: var(--color-primary-tint);
 }
 
-/* -------------------------------------------------------------------------
-   8. FOOTER
-   ------------------------------------------------------------------------- */
 .site-footer {
   background-color: var(--color-primary-dark);
   color: rgba(255, 255, 255, 0.92);
@@ -867,8 +959,7 @@ p {
 .footer__logo {
   height: 30px;
   width: auto;
-  /* Wordmark aslinya biru; filter berikut membuatnya putih agar
-     kontras di latar footer yang gelap. */
+  
   filter: brightness(0) invert(1);
   margin-bottom: var(--space-2);
 }
@@ -906,10 +997,6 @@ p {
   margin-top: var(--space-2);
 }
 
-/* Ikon sosial media di footer — SVG inline (bukan logo resmi platform)
-   supaya tidak menduplikasi aset bermerek pihak ketiga, tapi tetap mudah
-   dikenali bentuknya. Warna ikut currentColor, jadi otomatis pas di latar
-   footer yang gelap. */
 .social-icons {
   display: flex;
   gap: 10px;
@@ -950,12 +1037,6 @@ p {
   text-align: center;
 }
 
-/* -------------------------------------------------------------------------
-   LOKASI — panel alamat + peta (khusus halaman lokasi.html)
-   Dipisah dari .footer__grid supaya tidak ikut memakai grid 3 kolom milik
-   footer (itu penyebab tampilan aneh di desktop sebelumnya: 2 elemen
-   dipaksa masuk grid 3 kolom, kolom ke-3 kosong menganga).
-   ------------------------------------------------------------------------- */
 .lokasi-panel {
   display: grid;
   grid-template-columns: 1fr;
@@ -970,8 +1051,6 @@ p {
   background-color: var(--color-bg-alt);
 }
 
-/* aspect-ratio (bukan height tetap) supaya peta menyesuaikan lebar
-   kolomnya secara proporsional di perangkat apa pun. */
 .lokasi-map iframe {
   display: block;
   width: 100%;
@@ -991,9 +1070,6 @@ p {
   }
 }
 
-/* -------------------------------------------------------------------------
-   9. RESPONSIVE — TABLET (>= 768px)
-   ------------------------------------------------------------------------- */
 @media (min-width: 768px) {
   .nav-toggle {
     display: none;
@@ -1019,10 +1095,7 @@ p {
     position: relative;
   }
 
-  /* Garis bawah dinamis: tersembunyi (scaleX 0) lalu "tumbuh" dari kiri
-     saat hover/focus. Halaman aktif selalu menampilkannya (scaleX 1)
-     tanpa perlu hover. transform dipakai (bukan width) supaya animasinya
-     mulus di-GPU-accelerate, bukan memicu reflow tiap frame. */
+  
   .primary-nav a::after {
     content: "";
     position: absolute;
@@ -1079,8 +1152,7 @@ p {
     padding: 0 var(--space-3);
   }
 
-  /* Di tablet grid-nya 2 kolom, jadi item ke-1 dan ke-3 berada di kolom
-     kiri — garis pemisah kirinya perlu dihapus, bukan hanya item pertama. */
+  
   .service:nth-child(odd) {
     border-left: none;
     padding-left: 0;
@@ -1091,9 +1163,6 @@ p {
   }
 }
 
-/* -------------------------------------------------------------------------
-   10. RESPONSIVE — DESKTOP (>= 1024px)
-   ------------------------------------------------------------------------- */
 @media (min-width: 1024px) {
   .hero__content {
     padding-bottom: var(--space-7);
@@ -1104,7 +1173,7 @@ p {
     padding-block: var(--space-7);
   }
 
-  /* Desktop cukup lebar untuk 4 layanan sejajar dalam satu baris. */
+  
   .services__grid {
     grid-template-columns: repeat(4, 1fr);
     gap: var(--space-3);
@@ -1124,8 +1193,7 @@ p {
     grid-template-columns: repeat(4, 1fr);
   }
 
-  /* Sneak peek di Home tetap 3 kolom supaya 6 produk jatuh rapi
-     jadi 2 baris penuh, bukan 4 + 2 yang menggantung. */
+  
   .katalog-grid[data-mode="sneak-peek"] {
     grid-template-columns: repeat(3, 1fr);
   }
@@ -1143,9 +1211,6 @@ p {
   }
 }
 
-/* -------------------------------------------------------------------------
-   11. REDUCED MOTION & FOCUS
-   ------------------------------------------------------------------------- */
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
