@@ -365,8 +365,13 @@
     return url + pemisah + "_=" + Date.now() + Math.random().toString(36).slice(2);
   }
   function ambilCsv(url) {
+    var pengendali = typeof AbortController === "function" ? new AbortController() : null;
+    var batasWaktu = pengendali ? setTimeout(function() {
+      pengendali.abort();
+    }, CONFIG.SHEET_TIMEOUT_MS || 8000) : null;
     return fetch(tambahPemecahCache(url), {
-      cache: "no-store"
+      cache: "no-store",
+      signal: pengendali ? pengendali.signal : undefined
     }).then(function(res) {
       if (!res.ok) throw new Error("HTTP " + res.status);
       return res.text();
@@ -383,6 +388,12 @@
       }).filter(function(p) {
         return p.nama;
       });
+    }).then(function(hasil) {
+      clearTimeout(batasWaktu);
+      return hasil;
+    }, function(err) {
+      clearTimeout(batasWaktu);
+      throw err && err.name === "AbortError" ? new Error("Waktu habis saat memuat katalog") : err;
     });
   }
   function ambilProduk(daftarUrl) {
