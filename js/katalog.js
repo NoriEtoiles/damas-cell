@@ -100,9 +100,9 @@
     var teks = String(url).trim();
     if (!teks) return "";
     if (!/^https?:\/\//i.test(teks)) return "";
-    var cocok = teks.match(/drive\.google\.com\/file\/d\/([^/]+)/);
+    var cocok = teks.match(/drive\.google\.com\/file\/d\/([\w-]+)/);
     if (!cocok) {
-      cocok = teks.match(/drive\.google\.com\/open\?id=([^&]+)/);
+      cocok = teks.match(/drive\.google\.com\/open\?id=([\w-]+)/);
     }
     if (cocok && cocok[1]) {
       return "https://drive.google.com/thumbnail?id=" + cocok[1] + "&sz=w600";
@@ -150,7 +150,7 @@
     var harga = formatHarga(produk.harga);
     var hargaHtml = harga ? '<p class="produk__harga">' + escapeHtml(harga) + "</p>" : "";
     var kelasFoto = "produk__foto" + (isPlaceholder ? " produk__foto--placeholder" : "");
-    var imgTag = '<img class="' + kelasFoto + '" src="' + escapeHtml(fotoUtama) + '" alt="' + escapeHtml(produk.nama) + '" ' + 'loading="lazy" ' + "onerror=\"this.onerror=null;this.src='" + PLACEHOLDER_IMG + "';this.classList.add('produk__foto--placeholder');\">";
+    var imgTag = '<img class="' + kelasFoto + '" src="' + escapeHtml(fotoUtama) + '" alt="' + escapeHtml(produk.nama) + '" ' + 'loading="lazy">';
     var kontrolCarousel = "";
     if (jumlahFoto > 1) {
       kontrolCarousel = '<button type="button" class="produk__panah produk__panah--kiri" data-carousel-prev aria-label="Foto sebelumnya">&lsaquo;</button>' + '<button type="button" class="produk__panah produk__panah--kanan" data-carousel-next aria-label="Foto berikutnya">&rsaquo;</button>' + '<div class="produk__dots" aria-hidden="true">' + daftarFoto.map(function(_, i) {
@@ -172,7 +172,11 @@
     pos = (pos + arah + fotos.length) % fotos.length;
     mediaEl.setAttribute("data-pos", pos);
     var img = mediaEl.querySelector(".produk__foto");
-    if (img) img.src = fotos[pos];
+    if (img) {
+      img.removeAttribute("data-fallback");
+      img.classList.remove("produk__foto--placeholder");
+      img.src = fotos[pos];
+    }
     var dots = mediaEl.querySelectorAll(".produk__dot");
     dots.forEach(function(dot, i) {
       dot.classList.toggle("is-aktif", i === pos);
@@ -225,6 +229,8 @@
     detailState.indexAktif = (index + total) % total;
     var gambar = document.getElementById("modalDetailGambar");
     if (gambar) {
+      gambar.removeAttribute("data-fallback");
+      gambar.classList.remove("produk__foto--placeholder");
       gambar.src = detailState.fotos[detailState.indexAktif];
       gambar.alt = "Foto produk " + (detailState.indexAktif + 1) + " dari " + total;
     }
@@ -345,11 +351,20 @@
       renderGrid(wadahGrid, terpilih);
     });
   }
+  document.addEventListener("error", function(e) {
+    var img = e.target;
+    if (!img || img.tagName !== "IMG") return;
+    var milikKita = img.classList.contains("produk__foto") || img.classList.contains("modal-detail__gambar") || img.closest(".modal-detail__thumb");
+    if (!milikKita || img.getAttribute("data-fallback") === "1") return;
+    img.setAttribute("data-fallback", "1");
+    img.classList.add("produk__foto--placeholder");
+    img.src = PLACEHOLDER_IMG;
+  }, true);
   function tambahPemecahCache(url) {
     var pemisah = url.indexOf("?") === -1 ? "?" : "&";
     return url + pemisah + "_=" + Date.now() + Math.random().toString(36).slice(2);
   }
-  function ambilProduk(url) {
+  function ambilCsv(url) {
     return fetch(tambahPemecahCache(url), {
       cache: "no-store"
     }).then(function(res) {
@@ -357,17 +372,33 @@
       return res.text();
     }).then(function(csv) {
       var baris = parseCSV(csv);
-      if (baris.length < 2) return [];
+      if (!baris.length) throw new Error("Respons kosong");
       var petaKolom = cocokkanHeader(baris[0]);
       if (petaKolom.nama === undefined) {
         throw new Error("Kolom 'nama' tidak ditemukan di Sheet");
       }
+      if (baris.length < 2) return [];
       return baris.slice(1).map(function(r) {
         return baseToProduk(r, petaKolom);
       }).filter(function(p) {
         return p.nama;
       });
     });
+  }
+  function ambilProduk(daftarUrl) {
+    var urls = [].concat(daftarUrl).filter(Boolean);
+    var i = 0;
+    function coba() {
+      return ambilCsv(urls[i]).catch(function(err) {
+        i++;
+        if (i < urls.length) {
+          console.warn("[Damas Cell] Sumber katalog utama gagal, mencoba cadangan:", err.message);
+          return coba();
+        }
+        throw err;
+      });
+    }
+    return coba();
   }
   function init() {
     var wadahGrid = document.getElementById("katalogGrid");
@@ -376,6 +407,7 @@
     var modeSneakPeek = wadahGrid.getAttribute("data-mode") === "sneak-peek";
     var batas = modeSneakPeek ? CONFIG.SNEAK_PEEK_LIMIT || 6 : 0;
     var url = CONFIG.SHEET_CSV_URL;
+    var urlCadangan = CONFIG.SHEET_CSV_URL_CADANGAN;
     if (!url) {
       if (modeSneakPeek) {
         var sectionInduk = wadahGrid.closest("section");
@@ -388,7 +420,7 @@
       return;
     }
     wadahGrid.innerHTML = renderSkeleton(modeSneakPeek ? 3 : 6);
-    ambilProduk(url).then(function(produk) {
+    ambilProduk([url, urlCadangan]).then(function(produk) {
       if (!produk.length) {
         wadahGrid.classList.remove("katalog-grid");
         wadahGrid.innerHTML = panelPesan("Belum ada produk terdaftar", "Sheet katalog sudah tersambung, tapi belum ada baris produk yang terisi. Tambahkan produk di Google Sheet, lalu muat ulang halaman ini.", "Tanya Stok via WA");
