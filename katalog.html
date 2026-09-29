@@ -68,10 +68,50 @@
 
     <section class="katalog-section">
       <div class="container">
-        
-        <div class="katalog-filter" id="katalogFilter" hidden></div>
+        <div class="katalog-toolbar" id="katalogToolbar" tabindex="-1" hidden>
+          <div class="katalog-cari">
+            <label class="visually-hidden" for="katalogCari">Cari produk</label>
+            <svg class="katalog-cari__ikon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <circle cx="11" cy="11" r="6.5" stroke="currentColor" stroke-width="1.8"/>
+              <path d="m16 16 4.5 4.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+            </svg>
+            <input type="search" id="katalogCari" class="katalog-cari__input" placeholder="Cari produk, mis. Samsung A15" autocomplete="off" maxlength="80">
+            <button type="button" class="katalog-cari__hapus" id="katalogCariHapus" aria-label="Hapus pencarian" hidden>&times;</button>
+          </div>
+
+          <div class="katalog-urut">
+            <label class="visually-hidden" for="katalogUrut">Urutkan produk</label>
+            <select id="katalogUrut" class="katalog-urut__pilih" autocomplete="off">
+              <option value="">Urutkan: Bawaan</option>
+              <option value="murah">Harga termurah</option>
+              <option value="mahal">Harga termahal</option>
+              <option value="nama">Nama A–Z</option>
+            </select>
+          </div>
+
+          <div class="katalog-filter" id="katalogFilter" role="group" aria-label="Filter kategori" hidden></div>
+
+          <label class="katalog-toggle" for="katalogTersedia">
+            <input type="checkbox" id="katalogTersedia" class="katalog-toggle__input visually-hidden" autocomplete="off">
+            <span class="katalog-toggle__saklar" aria-hidden="true"></span>
+            <span class="katalog-toggle__teks">Tersedia saja</span>
+          </label>
+
+          <div class="katalog-info-baris">
+            <p class="katalog-info" id="katalogInfo" role="status" aria-live="polite"></p>
+            <button type="button" class="katalog-reset link-underline" id="katalogReset" hidden>Reset filter</button>
+          </div>
+        </div>
 
         <div class="katalog-grid" id="katalogGrid"></div>
+
+        <div class="placeholder-panel katalog-kosong" id="katalogKosong" hidden>
+          <img class="placeholder-panel__icon" src="assets/placeholder-foto-produk.png" alt="" width="56" height="56">
+          <h2>Produk tidak ditemukan</h2>
+          <p id="katalogKosongPesan"></p>
+          <a class="btn btn--accent" id="katalogKosongWa" href="https://wa.me/6285640179995" target="_blank" rel="noopener" data-cta="whatsapp" data-cta-location="katalog-kosong">Tanya via WA</a>
+          <div><button type="button" class="katalog-reset link-underline" id="katalogKosongReset">Reset filter</button></div>
+        </div>
       </div>
     </section>
   </main>

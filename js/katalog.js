@@ -320,7 +320,67 @@
     var produk = produkTertampil[idx];
     if (produk) bukaDetail(produk, kartu);
   });
-  function pasangFilter(wadahFilter, wadahGrid, semuaProduk) {
+  function normalisasiCari(teks) {
+    return String(teks == null ? "" : teks).toLowerCase().replace(/\s+/g, " ").trim();
+  }
+  function angkaHarga(raw) {
+    var teks = String(raw == null ? "" : raw).trim().toLowerCase().replace(/^rp\.?\s*/, "");
+    if (!/^[0-9][0-9.,\s]*$/.test(teks)) return null;
+    var angka = Number(teks.replace(/[^0-9]/g, ""));
+    return isFinite(angka) && angka > 0 ? angka : null;
+  }
+  function urutkanProduk(daftar, mode) {
+    var bungkus = daftar.map(function(p, i) {
+      return {
+        p: p,
+        i: i,
+        h: angkaHarga(p.harga)
+      };
+    });
+    bungkus.sort(function(a, b) {
+      var hasil = 0;
+      if (mode === "murah" || mode === "mahal") {
+        if (a.h === null && b.h === null) {
+          hasil = 0;
+        } else if (a.h === null) {
+          return 1;
+        } else if (b.h === null) {
+          return -1;
+        } else {
+          hasil = mode === "murah" ? a.h - b.h : b.h - a.h;
+        }
+      } else if (mode === "nama") {
+        hasil = a.p.nama.localeCompare(b.p.nama, "id", {
+          sensitivity: "base",
+          numeric: true
+        });
+      }
+      return hasil !== 0 ? hasil : a.i - b.i;
+    });
+    return bungkus.map(function(x) {
+      return x.p;
+    });
+  }
+  function cocokCari(produk, kata) {
+    if (!kata.length) return true;
+    var teks = normalisasiCari([ produk.nama, produk.kategori, produk.catatan ].join(" "));
+    return kata.every(function(k) {
+      return teks.indexOf(k) !== -1;
+    });
+  }
+  function produkTersedia(produk) {
+    var kelas = kelasStatus(produk.status);
+    return kelas !== "is-habis" && kelas !== "is-preorder";
+  }
+  function tandaiChip(wadahFilter, kategori) {
+    if (!wadahFilter) return;
+    wadahFilter.querySelectorAll(".filter-chip").forEach(function(b) {
+      var aktif = (b.getAttribute("data-kategori") || "") === kategori;
+      b.classList.toggle("is-active", aktif);
+      b.setAttribute("aria-pressed", aktif ? "true" : "false");
+    });
+  }
+  function pasangFilter(wadahFilter, semuaProduk, saatPilih) {
     if (!wadahFilter) return;
     var kategoriUnik = [];
     semuaProduk.forEach(function(p) {
@@ -332,24 +392,130 @@
       wadahFilter.hidden = true;
       return;
     }
-    var html = '<button class="filter-chip is-active" data-kategori="">Semua</button>';
+    var html = '<button type="button" class="filter-chip is-active" data-kategori="" aria-pressed="true">Semua</button>';
     kategoriUnik.forEach(function(k) {
-      html += '<button class="filter-chip" data-kategori="' + escapeHtml(k) + '">' + escapeHtml(k) + "</button>";
+      html += '<button type="button" class="filter-chip" data-kategori="' + escapeHtml(k) + '" aria-pressed="false">' + escapeHtml(k) + "</button>";
     });
     wadahFilter.innerHTML = html;
     wadahFilter.hidden = false;
     wadahFilter.addEventListener("click", function(e) {
       var tombol = e.target.closest(".filter-chip");
       if (!tombol) return;
-      wadahFilter.querySelectorAll(".filter-chip").forEach(function(b) {
-        b.classList.toggle("is-active", b === tombol);
-      });
-      var pilihan = tombol.getAttribute("data-kategori");
-      var terpilih = pilihan ? semuaProduk.filter(function(p) {
-        return p.kategori === pilihan;
-      }) : semuaProduk;
-      renderGrid(wadahGrid, terpilih);
+      var pilihan = tombol.getAttribute("data-kategori") || "";
+      tandaiChip(wadahFilter, pilihan);
+      saatPilih(pilihan);
     });
+  }
+  function pasangKontrol(wadahGrid, wadahFilter, semuaProduk) {
+    var el = {
+      toolbar: document.getElementById("katalogToolbar"),
+      cari: document.getElementById("katalogCari"),
+      hapus: document.getElementById("katalogCariHapus"),
+      urut: document.getElementById("katalogUrut"),
+      tersedia: document.getElementById("katalogTersedia"),
+      info: document.getElementById("katalogInfo"),
+      reset: document.getElementById("katalogReset"),
+      kosong: document.getElementById("katalogKosong"),
+      kosongPesan: document.getElementById("katalogKosongPesan"),
+      kosongWa: document.getElementById("katalogKosongWa"),
+      kosongReset: document.getElementById("katalogKosongReset")
+    };
+    var lengkap = Object.keys(el).every(function(k) {
+      return el[k];
+    });
+    if (!lengkap) {
+      renderGrid(wadahGrid, semuaProduk);
+      pasangFilter(wadahFilter, semuaProduk, function(kategori) {
+        renderGrid(wadahGrid, kategori ? semuaProduk.filter(function(p) {
+          return p.kategori === kategori;
+        }) : semuaProduk);
+      });
+      return;
+    }
+    var state = {
+      kategori: "",
+      cari: el.cari.value,
+      urut: el.urut.value,
+      tersedia: el.tersedia.checked
+    };
+    var pewaktu = null;
+    function terapkan() {
+      var teksCari = normalisasiCari(state.cari);
+      var kata = teksCari ? teksCari.split(" ") : [];
+      var hasil = semuaProduk.filter(function(p) {
+        if (state.kategori && p.kategori !== state.kategori) return false;
+        if (state.tersedia && !produkTersedia(p)) return false;
+        return cocokCari(p, kata);
+      });
+      hasil = urutkanProduk(hasil, state.urut);
+      renderGrid(wadahGrid, hasil);
+      var adaFilter = kata.length > 0 || !!state.kategori || state.tersedia;
+      el.info.textContent = adaFilter ? "Menampilkan " + hasil.length + " dari " + semuaProduk.length + " produk" : semuaProduk.length + " produk";
+      el.reset.hidden = !(adaFilter || state.urut);
+      el.hapus.hidden = !state.cari;
+      if (hasil.length) {
+        el.kosong.hidden = true;
+        return;
+      }
+      var kataTampil = teksCari.slice(0, 80);
+      el.kosongPesan.textContent = kataTampil ? "Tidak ada hasil untuk “" + kataTampil + "”. Coba kata kunci lain, atau tanya admin. Stok bisa saja ada meski belum terdaftar." : "Tidak ada produk yang cocok dengan filter yang dipilih. Coba ubah filter, atau tanya admin langsung.";
+      var pesanWa = kataTampil ? "Halo Admin Damas Cell, saya cari " + kataTampil + ", apakah ada?" : "Halo Admin Damas Cell, saya mau tanya stok yang tersedia";
+      el.kosongWa.setAttribute("href", "https://wa.me/" + WA_NUMBER + "?text=" + encodeURIComponent(pesanWa));
+      el.kosong.hidden = false;
+    }
+    function resetSemua() {
+      clearTimeout(pewaktu);
+      state.kategori = "";
+      state.cari = "";
+      state.urut = "";
+      state.tersedia = false;
+      el.cari.value = "";
+      el.urut.value = "";
+      el.tersedia.checked = false;
+      tandaiChip(wadahFilter, "");
+      terapkan();
+      el.toolbar.focus({
+        preventScroll: true
+      });
+    }
+    pasangFilter(wadahFilter, semuaProduk, function(kategori) {
+      state.kategori = kategori;
+      terapkan();
+    });
+    el.cari.addEventListener("input", function() {
+      state.cari = el.cari.value;
+      el.hapus.hidden = !state.cari;
+      clearTimeout(pewaktu);
+      pewaktu = setTimeout(terapkan, 150);
+    });
+    el.cari.addEventListener("keydown", function(e) {
+      if (e.key === "Escape" && el.cari.value) {
+        e.preventDefault();
+        el.cari.value = "";
+        state.cari = "";
+        clearTimeout(pewaktu);
+        terapkan();
+      }
+    });
+    el.hapus.addEventListener("click", function() {
+      el.cari.value = "";
+      state.cari = "";
+      clearTimeout(pewaktu);
+      terapkan();
+      el.cari.focus();
+    });
+    el.urut.addEventListener("change", function() {
+      state.urut = el.urut.value;
+      terapkan();
+    });
+    el.tersedia.addEventListener("change", function() {
+      state.tersedia = el.tersedia.checked;
+      terapkan();
+    });
+    el.reset.addEventListener("click", resetSemua);
+    el.kosongReset.addEventListener("click", resetSemua);
+    el.toolbar.hidden = false;
+    terapkan();
   }
   document.addEventListener("error", function(e) {
     var img = e.target;
@@ -438,11 +604,11 @@
         if (wadahFilter) wadahFilter.hidden = true;
         return;
       }
-      var tampil = batas ? produk.slice(0, batas) : produk;
-      renderGrid(wadahGrid, tampil);
-      if (!modeSneakPeek) {
-        pasangFilter(wadahFilter, wadahGrid, produk);
+      if (modeSneakPeek) {
+        renderGrid(wadahGrid, batas ? produk.slice(0, batas) : produk);
+        return;
       }
+      pasangKontrol(wadahGrid, wadahFilter, produk);
     }).catch(function(err) {
       console.error("[Damas Cell] Gagal memuat katalog:", err);
       if (modeSneakPeek) {
