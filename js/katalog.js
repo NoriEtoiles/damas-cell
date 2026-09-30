@@ -406,6 +406,34 @@
       saatPilih(pilihan);
     });
   }
+  var MODE_URUT = [ "murah", "mahal", "nama" ];
+  function bacaParameterUrl() {
+    var hasil = {
+      cari: "",
+      urut: "",
+      kategori: "",
+      tersedia: false
+    };
+    try {
+      var p = new URLSearchParams(window.location.search);
+      hasil.cari = (p.get("cari") || "").replace(/\s+/g, " ").trim().slice(0, 80);
+      hasil.urut = p.get("urut") || "";
+      hasil.kategori = p.get("kategori") || "";
+      hasil.tersedia = p.get("tersedia") === "1";
+    } catch (err) {}
+    return hasil;
+  }
+  function tulisParameterUrl(state) {
+    var bagian = [];
+    var cari = String(state.cari || "").replace(/\s+/g, " ").trim().slice(0, 80);
+    if (state.kategori) bagian.push("kategori=" + encodeURIComponent(state.kategori));
+    if (cari) bagian.push("cari=" + encodeURIComponent(cari));
+    if (state.tersedia) bagian.push("tersedia=1");
+    if (state.urut) bagian.push("urut=" + encodeURIComponent(state.urut));
+    try {
+      window.history.replaceState(null, "", window.location.pathname + (bagian.length ? "?" + bagian.join("&") : "") + window.location.hash);
+    } catch (err) {}
+  }
   function pasangKontrol(wadahGrid, wadahFilter, semuaProduk) {
     var el = {
       toolbar: document.getElementById("katalogToolbar"),
@@ -453,6 +481,7 @@
       el.info.textContent = adaFilter ? "Menampilkan " + hasil.length + " dari " + semuaProduk.length + " produk" : semuaProduk.length + " produk";
       el.reset.hidden = !(adaFilter || state.urut);
       el.hapus.hidden = !state.cari;
+      tulisParameterUrl(state);
       if (hasil.length) {
         el.kosong.hidden = true;
         return;
@@ -482,6 +511,29 @@
       state.kategori = kategori;
       terapkan();
     });
+    var awal = bacaParameterUrl();
+    if (awal.cari) {
+      state.cari = awal.cari;
+      el.cari.value = awal.cari;
+    }
+    if (MODE_URUT.indexOf(awal.urut) !== -1) {
+      state.urut = awal.urut;
+      el.urut.value = awal.urut;
+    }
+    if (awal.tersedia) {
+      state.tersedia = true;
+      el.tersedia.checked = true;
+    }
+    if (awal.kategori && wadahFilter) {
+      var semuaChip = wadahFilter.querySelectorAll(".filter-chip");
+      for (var i = 0; i < semuaChip.length; i++) {
+        if (semuaChip[i].getAttribute("data-kategori") === awal.kategori) {
+          state.kategori = awal.kategori;
+          tandaiChip(wadahFilter, awal.kategori);
+          break;
+        }
+      }
+    }
     el.cari.addEventListener("input", function() {
       state.cari = el.cari.value;
       el.hapus.hidden = !state.cari;
