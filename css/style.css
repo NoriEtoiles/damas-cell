@@ -1334,6 +1334,10 @@ body.has-modal-detail {
   margin-block: var(--space-6);
 }
 
+.lokasi-panel .footer__heading {
+  color: var(--color-text-muted);
+}
+
 .lokasi-map {
   border-radius: var(--radius-md);
   overflow: hidden;
